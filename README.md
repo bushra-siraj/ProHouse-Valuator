@@ -48,5 +48,5 @@ ProHouse-Valuator is a professional, end-to-end Machine Learning web application
 ## 🧑‍💻 Author
 **[Bushra]**
 * **Email:** [BushraSiraj586@gmail.com]
-* **GitHub:** [[(https://github.com/bushra-siraj)]
+* **GitHub:** [https://github.com/bushra-siraj]
 * **Linkedin:** [www.linkedin.com/in/bushrasiraj]
