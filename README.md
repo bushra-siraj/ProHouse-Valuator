@@ -42,11 +42,11 @@ ProHouse-Valuator is a professional, end-to-end Machine Learning web application
 ## 📈 Model Performance
 
 * **Algorithm:** Linear Regression
-* **Test RMSE:** ~$38,000
+* **Test RMSE:** $38,000
 
 ---
 ## 🧑‍💻 Author
 **[Bushra]**
 * **Email:** [BushraSiraj586@gmail.com]
-* **GitHub:** [bushra-siraj]
+* **GitHub:** [[(https://github.com/bushra-siraj)]
 * **Linkedin:** [www.linkedin.com/in/bushrasiraj]
