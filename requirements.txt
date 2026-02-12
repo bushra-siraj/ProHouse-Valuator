@@ -1,10 +1,7 @@
 streamlit
 pandas
-scikit-learn
 joblib
-streamlit-lottie
-python-dotenv
-matplotlib.pyplot
-os
 requests
+streamlit-lottie
+matplotlib
 seaborn
