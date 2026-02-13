@@ -5,3 +5,4 @@ requests
 streamlit-lottie
 matplotlib
 seaborn
+scikit-learn
