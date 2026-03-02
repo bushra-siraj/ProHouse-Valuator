@@ -2,17 +2,8 @@ import streamlit as st
 import pandas as pd
 import joblib
 import os
-import requests
+import json
 from streamlit_lottie import st_lottie
-
-import streamlit as st
-import pandas as pd
-import joblib
-import os
-import requests
-from streamlit_lottie import st_lottie
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 # --- 1. Configuration & Setup ---
 st.set_page_config(page_title="ProHouse Valuator", page_icon="🏢", layout="wide")
@@ -20,6 +11,7 @@ st.set_page_config(page_title="ProHouse Valuator", page_icon="🏢", layout="wid
 # Load the model
 @st.cache_resource
 def load_model():
+    # Make sure 'house_model.pkl' is in your GitHub repo root
     return joblib.load('house_model.pkl')
 
 model = load_model()
@@ -34,54 +26,48 @@ with st.sidebar:
     st.info("Built with Streamlit & Scikit-Learn")
 
 # --- 3. Lottie Animation Function ---
-def load_lottieurl(url: str):
-    r = requests.get(url)
-    if r.status_code != 200: return None
-    return r.json()
+def load_lottiefile(filename: str):
+    base_path = os.path.dirname(__file__)
+    filepath = os.path.join(base_path, filename)
+    try:
+        with open(filepath, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return None
 
-# Lottie animation for sidebar
-lottie_url = "https://lottie.host/cbe12934-49ff-4200-8a28-98bcb8ce30e5/Rtgtr2syMl.json"
-lottie_json = load_lottieurl(lottie_url)
+# Load global animations
+lottie_sidebar = load_lottiefile("animation2.json")
 
-# --- 4. Main UI Logic based on Sidebar ---
+# --- 4. Main UI Logic ---
 if app_mode == "Dashboard":
     st.title("📊 Property Market Analysis Dashboard")
     st.markdown("## Overview of Housing Trends & Data Insights")
     st.markdown("---")
     
-    # Lottie Animation
+    # Lottie Animation Header
     col_lottie, col_title = st.columns([1, 4])
     with col_lottie:
-        if lottie_json:
-            st_lottie(lottie_json, height=100, key="house")
+        if lottie_sidebar:
+            st_lottie(lottie_sidebar, height=100, key="sidebar_anim")
 
-    # --- 6 Graphs Grid Layout ---
+    # --- Graphs Grid Layout ---
     st.subheader("Key Visualizations")
     
-    # Graph Row 1
     g1, g2, g3 = st.columns(3)
-    with g1:
-        st.image("plot1.png", caption="Neighborhood Price Comparison")
-    with g2:
-        st.image("plot2.png", caption="Price vs Living Area")
-    with g3:
-        st.image("plot3.png", caption="Avg Price by House Style")
+    with g1: st.image("plot1.png", caption="Neighborhood Price Comparison")
+    with g2: st.image("plot2.png", caption="Price vs Living Area")
+    with g3: st.image("plot3.png", caption="Avg Price by House Style")
 
-    # Graph Row 2
     g4, g5, g6 = st.columns(3)
-    with g4:
-        st.image("plot4.png", caption="House Style Distribution by Foundation")
-    with g5:
-        st.image("plot5.png", caption="Pairplot of Key Features")
-    with g6:
-        st.image("plot6.png", caption="Price Distribution by Quality")
+    with g4: st.image("plot4.png", caption="House Style Distribution by Foundation")
+    with g5: st.image("plot5.png", caption="Pairplot of Key Features")
+    with g6: st.image("plot6.png", caption="Price Distribution by Quality")
 
 elif app_mode == "Live Prediction":
     st.title("🔮 Live Property Price Prediction")
     st.markdown("### Input property details below to get an instant valuation.")
     st.markdown("---")
     
-    # Input Fields Layout
     with st.form("prediction_form"):
         c1, c2, c3 = st.columns(3)
         
@@ -105,10 +91,10 @@ elif app_mode == "Live Prediction":
             
         submit_button = st.form_submit_button(label='🚀 Predict Price')
 
-    # Prediction Logic
+    # --- Prediction Logic (All inside this block) ---
     if submit_button:
         with st.spinner('Calculating valuation...'):
-            # Create DataFrame with exact column names from training
+            # 1. Prepare Data
             input_data = pd.DataFrame({
                 'GrLivArea': [gr_liv_area],
                 'FullBath': [full_bath],
@@ -121,26 +107,22 @@ elif app_mode == "Live Prediction":
                 'LotShape': [lot_shape]
             })
             
-            # Predict
+            # 2. Predict
             prediction = model.predict(input_data)[0]
 
+            # 3. Display Results
             st.markdown("---")
-        st.subheader("📊 Prediction Results")
-        
-        # Split result area into two columns: Price on left, Animation on right
-        res_col1, res_col2 = st.columns([2, 1])
-
-        result_lottie_url = "https://lottie.host/428219b1-42a1-4fb9-8d80-9a61bbabe469/2n9FH1xgIu.json"
-        result_lottie_json = load_lottieurl(result_lottie_url)
-        
-        with res_col1:
-            st.markdown("### 💰 Estimated Property Value")
-            st.success(f"# ${prediction:,.2f}")
+            st.subheader("📊 Prediction Results")
             
-        with res_col2:
-            if result_lottie_json:
-                # DIFFERENT ANIMATION KEY HERE
-                st_lottie(result_lottie_json, height=150, key="result_animation")
-        
-        # 🎉 Lottie animation in prediction result
-        st.balloons()
+            res_col1, res_col2 = st.columns([2, 1])
+            result_lottie = load_lottiefile("animation1.json")
+            
+            with res_col1:
+                st.markdown("### 💰 Estimated Property Value")
+                st.success(f"## ${prediction:,.2f}")
+                
+            with res_col2:
+                if result_lottie:
+                    st_lottie(result_lottie, height=150, key="result_animation")
+            
+            st.balloons()
